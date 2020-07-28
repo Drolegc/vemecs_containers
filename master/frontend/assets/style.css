@@ -1,0 +1,10 @@
+@import 'material-design-icons-iconfont/dist/material-design-icons.css';
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+
+.full-width{
+    width: 100%;
+}
+
+body{
+    font-family: 'Montserrat', sans-serif !important;
+}

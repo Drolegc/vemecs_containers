@@ -1,0 +1,72 @@
+version: '3'
+services: 
+  mysql-slave:
+    restart: always
+    image: mysql
+    volumes:
+      - javadbSlave:/var/lib/mysql
+    env_file:
+      - .env
+    networks: 
+      - master_master
+  
+  api-slave:
+    build:
+      ./api/
+    volumes:
+      - ./api/:/usr/local/tomcat/webapps/
+    ports:
+      - "30500:8080"
+    links:
+      - mysql-slave
+    networks: 
+      - master_master
+  
+  middleware-slave:
+    restart: always
+    build:
+      ./server/
+    ports:
+      - "8080:8088"
+    volumes:
+      - ./server/:/usr/src/app
+    env_file:
+      - .env
+    links:
+      - api-slave
+    networks: 
+      - master_master
+
+  vemec-slave:
+    build:
+      ./vemecs/
+    volumes:
+      - ./vemecs/:/usr/src/app
+    links:
+      - middleware-slave
+    networks: 
+      - master_master
+
+  frontend-slave:
+    restart: always
+    build:
+      ./frontend/
+    environment:
+      - HOST=0.0.0.0
+    ports:
+      - "4000:3000"
+    command:
+      "npm run start"
+    links:
+      - middleware-slave
+    networks: 
+      - master_master
+
+volumes: 
+  javadbSlave:
+  
+networks: 
+  master_master:
+    external: true
+  
+  

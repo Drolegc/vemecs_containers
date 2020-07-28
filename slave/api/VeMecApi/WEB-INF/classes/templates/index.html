@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelfea.org">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <title>Listar Datillos</title>
+    </head>
+
+    <body>
+        <div class="container mt-4">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <a th:href="@{/agregarGet}" class="btn">Agregar Persona</a>
+                </div>
+                <div class="card-body">
+                    <table border="1">
+                        <thead>
+                            <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Telefono</th>
+                        <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>  
+                            <tr th:each="usuario:${usuarios}">
+                            <td th:text="${usuario.ci}"></td>
+                            <td th:text="${usuario.nombre}"></td>
+                            <td th:text="${usuario.apellido}"></td>
+                            <td th:text="${usuario.telefono}"></td>
+                            <td><a th:href="@{/editar/}+${usuario.ci}"> Editar</a> / <a th:href="@{/borrar/}+${usuario.ci}"> Borrar </a></td>
+                            </tr>                       
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

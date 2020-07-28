@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymelfea.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+	crossorigin="anonymous">
+<title>Titulo</title>
+</head>
+<body>
+<div class="container mt-4">
+            <div class="card border-info">
+                <div class="card-header bg-info bg-info">
+                    <h4> Agregar una nueva persona</h4>
+                </div>
+               
+                    <form th:action="@{/save}" th:object=${usuario} method="POST">
+                     <div class="card-body">
+						<div class="form-group">
+	                        <label>Cedula</label>
+	                        <input th:field="*{ci}" type="text" name="ci" readonly="readonly" class="form-control">
+	                        <label>Nombre</label>
+	                         <input th:field="*{nombre}" type="text" name="nombre" class="form-control">
+	                        <label>Apellido</label>
+	                         <input th:field="*{apellido}" type="text" name="apellido" class="form-control">
+	                        <input type="submit" value="Actualizar" class="btn btn-success">
+	                        <a href="/">REGRESAR</a>
+	                        </div>
+						</div>
+                    </form>
+                
+                
+        </div>
+</body>
+</html>

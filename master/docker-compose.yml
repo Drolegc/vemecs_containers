@@ -1,0 +1,61 @@
+version: '3'
+services: 
+  mysql-master:
+    restart: always
+    image: mysql
+    volumes:
+      - javadbMaster:/var/lib/mysql
+    env_file:
+      - .env
+    networks: 
+      - master
+  
+  api-master:
+    build:
+      ./api/
+    volumes:
+      - ./api/:/usr/local/tomcat/webapps/
+    ports:
+      - "30400:8080"
+    networks: 
+      - master
+    links:
+      - mysql-master
+  
+  middleware-master:
+    restart: always
+    build:
+      ./server/
+    ports:
+      - "8081:8099"
+    volumes:
+      - ./server/:/usr/src/app
+    env_file:
+      - .env
+    links:
+      - api-master
+    networks: 
+      - master
+      
+  frontend-master:
+    restart: always
+    build:
+      ./frontend/
+    environment:
+      - HOST=0.0.0.0
+    ports:
+      - "3001:3000"
+    command:
+      "npm run start"
+    links:
+      - middleware-master
+    networks: 
+      - master
+
+volumes: 
+  javadbMaster:
+
+networks: 
+  master:
+    driver: bridge
+    
