@@ -5,7 +5,7 @@
         <v-toolbar color="transparent" class="pa-0 header" elevation="0">
           <v-spacer></v-spacer>
           <v-btn to="/" text exact class="white--text">Inicio</v-btn>
-          <v-btn @click="modalVemec = true" text exact class="white--text">Agregar veMec</v-btn>
+          <v-btn @click="modalVemec = true" text exact cl ass="white--text">Agregar veMec</v-btn>
           <v-btn @click="modalPaciente = true" text exact class="white--text">Pacientes</v-btn>
         </v-toolbar>
       </v-app-bar>
@@ -77,75 +77,72 @@
 </template>
 
 <script>
-  export default {
-    props: {
-      source: String,
-    },
-    data() {
-      return {
-        modalVemec: false,
-        modalPaciente: false,
-        vemecAgregado: false,
-        pacienteAgregado: false,
-        vemec: {},
-        paciente: {
-          data_paciente: {}
+    export default {
+        props: {
+            source: String,
         },
-        dataPaciente: {
-          vemec: {}
+        data() {
+            return {
+                modalVemec: false,
+                modalPaciente: false,
+                vemecAgregado: false,
+                pacienteAgregado: false,
+                vemec: {},
+                paciente: {
+                    data_paciente: {}
+                },
+                dataPaciente: {
+                    vemec: {}
+                },
+                medicos: []
+            }
         },
-        medicos: []
-      }
-    },
-    created() {
-    },
-    methods: {
-      createVemec() {
-        this.$axios.post('http://picacode.ddns.net:8080/vemecs/', this.vemec, {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          })
-          .then(() => {
-            this.$root.$emit('vemecAdded', 1)
-            this.modalVemec = false
-            this.vemecAgregado = true
-            this.vemec = {}
-            setTimeout(() => {
-              this.vemecAgregado = false
-            }, 5000)
-          })
-      },
-      createPaciente() {
-        this.$axios.post('http://picacode.ddns.net:8080/pacientes/', this.paciente, {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          })
-          .then(() => {
-            this.modalPaciente = false
-            this.pacienteAgregado = true
-            this.paciente = {
-              data_paciente: {}
-            }
-            setTimeout(() => {
-              this.pacienteAgregado = false
-            }, 5000)
-          })
-      },
-    },
-      computed: {
-        vemecs() {
-          return this.$store.getters.vemecs
+        created() {},
+        methods: {
+            createVemec() {
+                this.$axios.post('http://picacode.ddns.net:8080/vemecs/', this.vemec, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then(() => {
+                        this.$root.$emit('vemecAdded', 1)
+                        this.modalVemec = false
+                        this.vemecAgregado = true
+                        this.vemec = {}
+                        setTimeout(() => {
+                            this.vemecAgregado = false
+                        }, 5000)
+                    })
+            },
+            createPaciente() {
+                this.$axios.post('http://picacode.ddns.net:8080/pacientes/', this.paciente, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then(() => {
+                        this.modalPaciente = false
+                        this.pacienteAgregado = true
+                        this.paciente = {
+                            data_paciente: {}
+                        }
+                        setTimeout(() => {
+                            this.pacienteAgregado = false
+                        }, 5000)
+                    })
+            },
         },
-      }
-  }
-
+        computed: {
+            vemecs() {
+                return this.$store.getters.vemecs
+            },
+        }
+    }
 </script>
 <style>
-  .content {
-    margin-top: 45px;
-    margin-bottom: 45px;
-  }
-
+    .content {
+        margin-top: 45px;
+        margin-bottom: 45px;
+    }
 </style>

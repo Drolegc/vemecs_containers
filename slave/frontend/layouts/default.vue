@@ -100,7 +100,18 @@
         created() {},
         methods: {
             createVemec() {
-                this.$axios.post('http://localhost:8080/vemecs/', this.vemec, {
+                var data = {
+                    data_vemec: {
+                        id: this.vemec.id,
+                        marca: this.vemec.marca,
+                        modelo: this.vemec.modelo
+                    },
+                    data_ubicacion: {
+                        nombre: this.vemec.sectorHospitalario,
+                        url: "http://example.com"
+                    }
+                }
+                this.$axios.post('http://localhost:8080/vemecs/', data, {
                         headers: {
                             'Access-Control-Allow-Origin': '*'
                         }

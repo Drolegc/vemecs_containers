@@ -220,10 +220,12 @@
                 })
 
                 socket.on('messages', (data) => {
-                    this.data = data.data_historial
-                    if (data.vemec_id == this.$route.params.id_vemec)
+                    if (data.vemec_id == this.$route.params.id_vemec) {
+                        this.data = data.data_historial
                         this.values1.push(data.data_historial[this.select1.value])
-                    this.values2.push(data.data_historial[this.select2.value])
+                        this.values2.push(data.data_historial[this.select2.value])
+                    }
+
                     if (this.values1.length > 10) {
                         this.values1.shift()
                     }
@@ -240,28 +242,39 @@
                         }
                     })
                     .then((data) => {
+                        console.log(data.data)
                         this.dataPaciente = data.data
                     })
                     .catch(() => {
+                        console.log("No se consiguio el paciente conectado al vemec")
                         this.errorGetPaciente = true
                         this.vemec.id = this.dataPaciente.vemec_id
                         this.modalVemec = true
                     })
             },
             getVemecs() {
-                this.$axios.get('http://picacode.ddns.net:8080/vemecs/', {
+                this.$axios.get('http://localhost:8080/vemecs/' + this.$route.params.id_vemec, {
                         headers: {
                             'Access-Control-Allow-Origin': '*'
                         }
                     })
-                    .then((data) => {
+                    .then((resp) => {
+
+                        var vemec = resp.data
+                        console.log(vemec)
+                        this.vemecs = [{
+                            text: `${vemec.marca} - ${vemec.modelo} - ${vemec.sectorHospitalario}`,
+                            value: vemec.id
+                        }]
+
+                        /*
                         this.vemecs = data.data.map((vemec) => {
                             let data = {}
                             data.text = `${vemec.marca} - ${vemec.modelo} - ${vemec.sectorHospitalario}`
                             data.value = vemec.id
                             return data
-                        })
-                    })
+                        })*/
+                    }).catch((error) => console.log("No conseguimos el vemec"))
             },
             createVemec() {
                 this.$axios.post('http://localhost:30500/VeMecApi/vemecs/', this.vemec, {

@@ -190,6 +190,16 @@ app.post("/ficha", bodyParser.json(), function(request, response) {
 
 })
 
+app.get('/vemecs/:id', async function(req, res) {
+    console.log("Request /vemecs/:id")
+    var vemec = await axios.get('http://middleware-master:8099/vemecs/' + req.params.id, {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    })
+    res.send(vemec.data)
+})
+
 app.post("/vemecs/", bodyParser.json(), function(request, response) {
     console.log("Nuevo vemec a registrar")
     axios.post('http://middleware-master:8099/VeMecApi/vemecs/', request.body, { headers: { 'Access-Control-Allow-Origin': '*' } })
@@ -202,7 +212,7 @@ app.post("/pacientes/", bodyParser.json(), function(request, response) {
         .then((res) => { response.send(res.data) }).catch((e) => {})
 })
 
-app.get("/pacientes/vemecs/:id", bodyParser.json(), async function(req, res) {
+app.get("/pacientes/vemec/:id", bodyParser.json(), async function(req, res) {
     var response = await axios.get("http://middleware-master:8099/pacientes/vemec/" + req.params.id, { headers: { 'Access-Control-Allow-Origin': '*' } })
     res.send(response.data)
 })

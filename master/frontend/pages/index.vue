@@ -99,12 +99,22 @@
                   <v-text-field label="Lugar de residencia" v-model="paciente.lugarResidencia" outlined color="primary">
                   </v-text-field>
                 </v-col>
+                <v-col class="col-12 col-md-12">
+    
+                  <label for="desde">Desde</label>
+                  <input type="text" name="desde" id="desde" v-model="desde" placeholder="2020-05-20 00:00:00">
+                  <label for="hasta">Hasta</label>
+                  <input type="text" name="hasta" id="hasta" v-model="hasta" placeholder="2020-06-20 00:00:00">
+                  <v-btn color="blue" class="black--text font-weight-light" @click="descargarFichaPDF()" outlined>FICHA PDF</v-btn>
+                
+                </v-col>
               </v-row>
             </template>
 
 </v-card-text>
 <v-divider></v-divider>
 <v-card-actions>
+
     <v-spacer></v-spacer>
     <template v-if="accionMedica">
               <v-btn color="red" @click="accionMedica = false; modalPaciente = false" class="black--text font-weight-light" outlined>
@@ -136,6 +146,7 @@
 <script>
     import cardVemec from '~/components/cardVemec.vue'
     import io from 'socket.io-client';
+    import downloadjs from 'downloadjs'
 
     export default {
         components: {
@@ -161,7 +172,9 @@
                 },
                 medicos: [],
                 errorGetPaciente: false,
-                accionAgregada: false
+                accionAgregada: false,
+                desde: "",
+                hasta: ""
             }
         },
         created() {
@@ -176,6 +189,7 @@
             })
         },
         methods: {
+
             getData() {
                 var socket = io.connect('http://localhost:8081', {
                     'forceNew': true
@@ -210,8 +224,9 @@
                 this.paciente = $e
             },
             addAccionMedica() {
-                this.accion.paciente_id = 1111
-                this.$axios.post('http://picacode.ddns.net:8080/fichas/', this.accion, {
+                this.accion.paciente_id = this.paciente.documento_id
+                console.log(JSON.stringify(this.accion))
+                this.$axios.post('http://localhost:8081/fichas/', this.accion, {
                     headers: {
                         'Access-Control-Allow-Origin': '*'
                     }
@@ -290,6 +305,17 @@
                             this.vemecAgregado = false
                         }, 5000)
                     })
+            },
+            async descargarFichaPDF() {
+
+                var data = {
+                    paciente_id: this.paciente.documento_id,
+                    timeInicio: this.desde,
+                    timeFin: this.hasta
+                }
+                var response = await this.$axios.post('http://picacode.ddns.net:8080/fichas/ficha', data)
+                downloadjs(response.data, "ficha", 'application/pdf')
+
             }
         },
         computed: {

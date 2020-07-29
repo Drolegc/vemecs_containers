@@ -50,7 +50,7 @@
                 </v-col>
               </v-row>
             </template>
-            <template v-else>
+<template v-else>
               <v-row>
                 <v-col class="col-12 col-md-12">
                   <v-text-field label="Documento" v-model="paciente.documento_id" readonly filled outlined
@@ -102,11 +102,11 @@
               </v-row>
             </template>
 
-          </v-card-text>
-          <v-divider></v-divider>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <template v-if="accionMedica">
+</v-card-text>
+<v-divider></v-divider>
+<v-card-actions>
+    <v-spacer></v-spacer>
+    <template v-if="accionMedica">
               <v-btn color="red" @click="accionMedica = false; modalPaciente = false" class="black--text font-weight-light" outlined>
                 Cerrar
               </v-btn>
@@ -114,7 +114,7 @@
                 AGREGAR ACCION MEDICA
               </v-btn>
             </template>
-            <template v-else>
+    <template v-else>
               <v-btn color="red" @click="modalPaciente = false" class="black--text font-weight-light" outlined>
                 Cerrar
               </v-btn>
@@ -122,218 +122,213 @@
                 Accion medica
               </v-btn>
             </template>
-          </v-card-actions>
-        </v-form>
-        <v-snackbar
-        color="success"
-          v-model="accionAgregada"
-        >
-          Accion medica agregada
-          <v-btn text @click.native="accionAgregada = false">Cerrar</v-btn>
-        </v-snackbar>
-      </v-card>
-    </v-dialog>
-  </v-container>
+</v-card-actions>
+</v-form>
+<v-snackbar color="success" v-model="accionAgregada">
+    Accion medica agregada
+    <v-btn text @click.native="accionAgregada = false">Cerrar</v-btn>
+</v-snackbar>
+</v-card>
+</v-dialog>
+</v-container>
 </template>
 
 <script>
-  import cardVemec from '~/components/cardVemec.vue'
-  import io from 'socket.io-client';
+    import cardVemec from '~/components/cardVemec.vue'
+    import io from 'socket.io-client';
 
-  export default {
-    components: {
-      cardVemec
-    },
-    data() {
-      return {
-        modalVemec: false,
-        modalPaciente: false,
-        vemecAgregado: false,
-        pacienteAgregado: false,
-        accionMedica: false,
-        accion:{
-          data_ficha:{}
+    export default {
+        components: {
+            cardVemec
         },
-        vemec: {},
-        pacientes: [],
-        paciente: {},
-        modalPaciente: false,
-        values: {
-          pulsaciones: {},
-          vemec: {}
+        data() {
+            return {
+                modalVemec: false,
+                modalPaciente: false,
+                vemecAgregado: false,
+                pacienteAgregado: false,
+                accionMedica: false,
+                accion: {
+                    data_ficha: {}
+                },
+                vemec: {},
+                pacientes: [],
+                paciente: {},
+                modalPaciente: false,
+                values: {
+                    pulsaciones: {},
+                    vemec: {}
+                },
+                medicos: [],
+                errorGetPaciente: false,
+                accionAgregada: false
+            }
         },
-        medicos:[],
-        errorGetPaciente: false,
-        accionAgregada: false
-      }
-    },
-    created() {
-      this.getData()
-      this.getVemecs()
-      this.getPacientes()
-      this.getMedicos()
-    },
-    mounted() {
-      this.$root.$on('vemecAdded',()=>{
-        this.getVemecs()
-      })
-    },
-    methods: {
-      getData() {
-        var socket = io.connect('https://118d7363f085.ngrok.io', {
-          'forceNew': true
-        });
-        socket.on('messages', (data) => {
-          this.values.vemec = data.vemec_energia
-          this.values.pulsaciones = {
-            "vemec": data.vemec_id,
-            "valor": data.data_historial.pulsaciones
-          }
-
-        })
-      },
-      openPatient($e) {
-        this.modalPaciente = true
-        this.paciente = $e
-      },
-      addAccionMedica(){
-        this.accion.paciente_id = 1111
-        this.$axios.post('http://picacode.ddns.net:8080/fichas/', this.accion, {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          }).then(()=>{
-            this.accionAgregada = true
-            this.modalPaciente = false 
-            this.accionMedica = false
-          })
-
-      },
-      createPaciente() {
-        this.$axios.post('http://picacode.ddns.net:8080/pacientes/', this.paciente, {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          })
-          .then(() => {
-            this.modalPaciente = false
-            this.pacienteAgregado = true
-            this.paciente = {
-              data_paciente: {}
-            }
-            this.errorGetPaciente = false
-            setTimeout(() => {
-              this.pacienteAgregado = false
-            }, 5000)
-          })
-      },
-      getMedicos() {
-        this.$axios.get('http://picacode.ddns.net:8080/medicos/')
-          .then((data)=>{
-            this.medicos = data.data.map((medico)=>{
-              let data = {}
-              data.value = medico.documento_id 
-              data.text = `${medico.nombre} ${medico.apellido}`
-              return data
-            })
-          })
-      },
-      getPacientes() {
-        this.$axios.get(`http://picacode.ddns.net:8080/pacientes/`, {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          })
-          .then((data) => {
-            this.pacientes = data.data
-          })
-      },
-      getVemecs() {
-        this.$axios.get('http://picacode.ddns.net:8080/vemecs/', {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          })
-          .then((data) => {
-            this.$store.dispatch('setVemecs',data.data)
-          })
-      },
-      createVemec() {
-        this.$axios.post('http://localhost:30500/VeMecApi/vemecs/', this.vemec, {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          })
-          .then(() => {
+        created() {
+            this.getData()
             this.getVemecs()
-            if (this.errorGetPaciente) {
-              this.modalPaciente = true
-              this.paciente.vemec_id = String(this.vemec.id)
+            this.getPacientes()
+            this.getMedicos()
+        },
+        mounted() {
+            this.$root.$on('vemecAdded', () => {
+                this.getVemecs()
+            })
+        },
+        methods: {
+            getData() {
+                var socket = io.connect('https://localhost:8080', {
+                    'forceNew': true
+                });
+                socket.on('messages', (data) => {
+                    this.values.vemec = data.vemec_energia
+                    this.values.pulsaciones = {
+                        "vemec": data.vemec_id,
+                        "valor": data.data_historial.pulsaciones
+                    }
+
+                })
+            },
+            openPatient($e) {
+                this.modalPaciente = true
+                this.paciente = $e
+            },
+            addAccionMedica() {
+                this.accion.paciente_id = 1111
+                this.$axios.post('http://picacode.ddns.net:8080/fichas/', this.accion, {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }).then(() => {
+                    this.accionAgregada = true
+                    this.modalPaciente = false
+                    this.accionMedica = false
+                })
+
+            },
+            createPaciente() {
+                this.$axios.post('http://picacode.ddns.net:8080/pacientes/', this.paciente, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then(() => {
+                        this.modalPaciente = false
+                        this.pacienteAgregado = true
+                        this.paciente = {
+                            data_paciente: {}
+                        }
+                        this.errorGetPaciente = false
+                        setTimeout(() => {
+                            this.pacienteAgregado = false
+                        }, 5000)
+                    })
+            },
+            getMedicos() {
+                this.$axios.get('http://picacode.ddns.net:8080/medicos/')
+                    .then((data) => {
+                        this.medicos = data.data.map((medico) => {
+                            let data = {}
+                            data.value = medico.documento_id
+                            data.text = `${medico.nombre} ${medico.apellido}`
+                            return data
+                        })
+                    })
+            },
+            getPacientes() {
+                this.$axios.get(`http://picacode.ddns.net:8080/pacientes/`, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then((data) => {
+                        this.pacientes = data.data
+                    })
+            },
+            getVemecs() {
+                this.$axios.get('http://localhost:8080/vemecs/', {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then((data) => {
+                        this.$store.dispatch('setVemecs', data.data)
+                    })
+            },
+            createVemec() {
+                this.$axios.post('http://localhost:8080/VeMecApi/vemecs/', this.vemec, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*'
+                        }
+                    })
+                    .then(() => {
+                        this.getVemecs()
+                        if (this.errorGetPaciente) {
+                            this.modalPaciente = true
+                            this.paciente.vemec_id = String(this.vemec.id)
+                        }
+                        this.modalVemec = false
+                        this.vemecAgregado = true
+                        this.vemec = {}
+                        setTimeout(() => {
+                            this.vemecAgregado = false
+                        }, 5000)
+                    })
             }
-            this.modalVemec = false
-            this.vemecAgregado = true
-            this.vemec = {}
-            setTimeout(() => {
-              this.vemecAgregado = false
-            }, 5000)
-          })
-      }
-    },
-    computed: {
-      vemecs() {
-        return this.$store.getters.vemecs
-      },
-      computedElementos1() {
-        return this.elementos1.filter((elemento) => {
-          if (elemento.value != this.select1.value) {
-            return elemento
-          }
-        })
-      },
-      computedElementos2() {
-        return this.elementos2.filter((elemento) => {
-          if (elemento.value != this.select2.value) {
-            return elemento
-          }
-        })
-      }
-    },
-    watch: {
-      select1() {
-        this.values1 = [10, 10, 10, 10]
-        this.loading1 = true
-        setTimeout(() => {
-          this.loading1 = false
-        }, 3000)
-      },
-      select2() {
-        this.values2 = [10, 10, 10, 10]
-        this.loading2 = true
-        setTimeout(() => {
-          this.loading2 = false
-        }, 3000)
+        },
+        computed: {
+            vemecs() {
+                return this.$store.getters.vemecs
+            },
+            computedElementos1() {
+                return this.elementos1.filter((elemento) => {
+                    if (elemento.value != this.select1.value) {
+                        return elemento
+                    }
+                })
+            },
+            computedElementos2() {
+                return this.elementos2.filter((elemento) => {
+                    if (elemento.value != this.select2.value) {
+                        return elemento
+                    }
+                })
+            }
+        },
+        watch: {
+            select1() {
+                this.values1 = [10, 10, 10, 10]
+                this.loading1 = true
+                setTimeout(() => {
+                    this.loading1 = false
+                }, 3000)
+            },
+            select2() {
+                this.values2 = [10, 10, 10, 10]
+                this.loading2 = true
+                setTimeout(() => {
+                    this.loading2 = false
+                }, 3000)
 
-      }
+            }
+        }
     }
-  }
-
 </script>
 
 <style>
-  .title-card {
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block !important;
-  }
-
-  .card-header {
-    background: #4CAF50 !important;
-  }
-
-  .full-width {
-    width: 100%;
-  }
-
+    .title-card {
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block !important;
+    }
+    
+    .card-header {
+        background: #4CAF50 !important;
+    }
+    
+    .full-width {
+        width: 100%;
+    }
 </style>

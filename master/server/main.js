@@ -8,7 +8,7 @@ app.use(cors({ origin: '*' }))
 var server = require('http').Server(app)
 var io = require('socket.io')(server)
 
-var url = "http://api-master:8080"
+var url = "http://picacode.ddns.net:8080"
 
 // Servidor a la escucha
 server.listen(8099, function() {
@@ -22,11 +22,23 @@ io.on('connection', (socket) => {
     socket.on('masterMiddleware', (data) => {
         console.log("Nuevos datos recibidos")
         io.emit("frontMaster", data)
-            //guardarDatosHistorial(data)
+        axios.post(url + '/historiales/', data)
+            .then((res) => console.log("Datos del historial guardados"))
+            .catch((error) => console.log("Problemas guardando historial"))
     })
 })
 
 app.get('/', (req, res) => res.send("Middleware del master"))
+
+app.get('/medicos/', async function(req, res) {
+    console.log("Request medicos")
+    var medicos = await axios.get(url + '/medicos/', {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    })
+    res.send(medicos.data)
+})
 
 app.get('/vemecs/', async function(req, res) {
     console.log("Request /vemecs/")
@@ -38,54 +50,58 @@ app.get('/vemecs/', async function(req, res) {
     res.send(vemecs.data)
 })
 
-app.get('/pacientes/vemecs/:id', bodyParser.json(), async function(req, res) {
-    console.log("Request /pacientes/vemecs/" + req.params.id)
-    var response = await axios.get(url + '/pacientes/vemecs/' + req.params.id, req.body, {
+app.get('/vemecs/:id', async function(req, res) {
+    console.log("Request /vemecs/:id")
+    var vemec = await axios.get(url + '/vemecs/' + req.params.id, {
         headers: {
             'Access-Control-Allow-Origin': '*'
         }
     })
+    res.send(vemec.data)
+})
+
+app.get('/pacientes/vemec/:id', bodyParser.json(), async function(req, res) {
+    console.log("Request /pacientes/vemecs/" + req.params.id)
+    var response = await axios.get(url + '/pacientes/vemec/' + req.params.id, req.body, {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    }).catch("No existe asociacion paciente - vemec con ese id")
+    res.send(response.data)
+})
+
+app.post('/fichas/', bodyParser.json(), async function(req, res) {
+    console.log("Request POST /fichas/")
+    console.log(req.body)
+    var response = await axios.post(url + '/fichas/', req.body, {
+        headers: {
+            'Access-Control-Allow-Origin': '*'
+        }
+    }).catch((error) => console.error("ERROR " + error))
     res.send(response.data)
 })
 
 app.post('/VeMecApi/vemecs/', bodyParser.json(), async function(req, res) {
-    console.log("Request /VeMecApi/vemecs/")
-    var response = await axios.post(url + '/VeMecApi/vemecs/', req.body, {
+    console.log("Request POST /vemecs/")
+    console.log(res.body)
+    var response = await axios.post(url + '/vemecs/', req.body, {
         headers: {
             'Access-Control-Allow-Origin': '*'
         }
-    })
+    }).catch((error) => console.error("ERROR " + error))
+    console.log(response.data)
     res.send(response.data)
     io.emit("nuevoVemec", "Nuevo vemec a sido registrado desde un slave")
 })
 
 app.post('/VeMecApi/pacientes/', bodyParser.json(), async function(req, res) {
-    console.log("Request /VeMecApi/pacientes/")
-    var response = await axios.post(url + '/VeMecApi/pacientes/', req.body, {
+    console.log("Request POST /pacientes/")
+    console.log(req.body)
+    var response = await axios.post(url + '/pacientes/', req.body, {
         headers: {
             'Access-Control-Allow-Origin': '*'
         }
-    })
+    }).catch((error) => console.log("Error " + error))
     res.send(response.data)
     io.emit("nuevoPaciente", "Nuevo paciente a sido registrado desde un slave")
 })
-
-function guardarDatosHistorial(data) {
-    axios.post('http://api:8080/VeMecApi/historiales/', sendData, { headers: { 'Access-Control-Allow-Origin': '*' } })
-        .then((response) => { console.log(response) }).catch((e) => { console.log(e) })
-}
-
-function guardarDatosVemec(data) {
-    axios.post('http://api:8080/VeMecApi/vemecs/', sendData, { headers: { 'Access-Control-Allow-Origin': '*' } })
-        .then((response) => { console.log(repsonse) }).catch((e) => { console.log(e) })
-}
-
-function guardarDatosPaciente(data) {
-    axios.post('http://api:8080/VeMecApi/pacientes/', sendData, { headers: { 'Access-Control-Allow-Origin': '*' } })
-        .then((repsonse) => { console.log(response) }).catch((e) => { console.log(e) })
-}
-
-function guardarDatosFicha(data) {
-    axios.post('http://api:8080/VeMecApi/fichas/', sendData, { headers: { 'Access-Control-Allow-Origin': '*' } })
-        .then((response) => { console.log(response) }).catch((e) => { console.log(e) })
-}
