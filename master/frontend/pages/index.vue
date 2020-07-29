@@ -306,15 +306,11 @@
                         }, 5000)
                     })
             },
-            async descargarFichaPDF() {
-
-                var data = {
-                    paciente_id: this.paciente.documento_id,
-                    timeInicio: this.desde,
-                    timeFin: this.hasta
-                }
-                var response = await this.$axios.post('http://picacode.ddns.net:8080/fichas/ficha', data)
-                downloadjs(response.data, "ficha", 'application/pdf')
+            descargarFichaPDF() {
+                var inicio = this.desde.replace(" ", "T")
+                var fin = this.hasta.replace(" ", "T")
+                var paciente = this.paciente.documento_id
+                window.open(`http://picacode.ddns.net:8080/fichas/ficha?inicio=${inicio}&fin=${fin}&documento_id=${paciente}`)
 
             }
         },
